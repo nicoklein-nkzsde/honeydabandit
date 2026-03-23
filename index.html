@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIB – Produktionsskript | HoneyDaBandit</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1c1c1c;
+    --border: #2a2a2a;
+    --gold: #c9a84c;
+    --gold-dim: #8a7033;
+    --text: #e0e0e0;
+    --text-dim: #777;
+    --text-bright: #fff;
+    --red: #c0392b;
+    --blue: #3498db;
+    --green: #27ae60;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 40px;
+    text-align: center;
+  }
+  .header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+  }
+  .header .artist {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-dim);
+  }
+  .header .meta {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .header .meta span {
+    color: var(--gold);
+  }
+
+  /* ---- LAYOUT ---- */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 40px 80px;
+  }
+
+  /* ---- SECTION ---- */
+  section {
+    margin-top: 50px;
+  }
+  section h2 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin: 30px 0 14px;
+  }
+  section p {
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 12px;
+    font-weight: 300;
+  }
+  .note {
+    background: var(--surface);
+    border-left: 3px solid var(--gold);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--text);
+    border-radius: 0 6px 6px 0;
+  }
+  .note strong { color: var(--gold); }
+
+  /* ---- EQUIPMENT TABLE ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-weight: 300;
+  }
+  tr:hover td { background: var(--surface); }
+  .key-shot td { border-left: 3px solid var(--gold); }
+  .key-shot .shot-label {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* ---- LYRIC BLOCKS ---- */
+  .lyric-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .lyric-block .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .block-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: 1px;
+  }
+  .block-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .lyric-line {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+  .lyric-line:last-child { border-bottom: none; }
+  .lyric-text {
+    padding: 8px 18px;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 300;
+    border-right: 1px solid var(--border);
+  }
+  .lyric-text.highlight {
+    color: var(--gold);
+    font-weight: 400;
+  }
+  .lyric-direction {
+    padding: 8px 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .lyric-direction strong {
+    color: var(--text);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* ---- SHOT CARDS ---- */
+  .shot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .shot-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .shot-card .sc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gold-dim);
+    margin-bottom: 4px;
+  }
+  .shot-card .sc-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 8px;
+  }
+  .shot-card .sc-detail {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  .shot-card .sc-detail strong { color: var(--text); }
+  .shot-card.featured {
+    border-color: var(--gold-dim);
+    grid-column: 1 / -1;
+  }
+
+  /* ---- CHECKLIST ---- */
+  .checklist {
+    list-style: none;
+    margin: 14px 0;
+  }
+  .checklist li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+    font-size: 14px;
+    font-weight: 300;
+    border-bottom: 1px solid var(--border);
+  }
+  .checklist li::before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--text-dim);
+    font-size: 16px;
+  }
+  .checklist li strong { color: var(--text-bright); font-weight: 600; }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  @media (max-width: 700px) {
+    .header { padding: 40px 20px 30px; }
+    .header h1 { font-size: 36px; }
+    .container { padding: 0 20px 60px; }
+    .shot-grid { grid-template-columns: 1fr; }
+    .lyric-line { grid-template-columns: 1fr; }
+    .lyric-direction { border-top: 1px dashed var(--border); }
+    .header .meta { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <div class="label">Produktionsskript</div>
+  <h1>„MIB"</h1>
+  <div class="artist">HoneyDaBandit</div>
+  <div class="meta">
+    <div><span>Laufzeit</span> 2:36</div>
+    <div><span>Format</span> 4K / S-Log3</div>
+    <div><span>Locations</span> Frankfurt</div>
+    <div><span>Style</span> Dark & Moody</div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ============ 1. OVERVIEW ============ -->
+<section>
+  <h2>01 — Kreative Vision</h2>
+  <p>Dunkles, cineastisches Rapvideo. Die MIB-Ästhetik wird als visuelles Stilmittel genutzt – nicht als Cosplay. Schwarzer Anzug, Sonnenbrille, Schatten, Nebel. Ein Rapper, der sich die Codes eines Agenten aneignet und sie auf der Straße lebt.</p>
+  <p>Visuell: Low Key Lighting, harte Schatten, starkes Backlight, viele Close-Ups. Wenige Locations, aber jeder Shot sitzt. Mehr Film als Musikvideo.</p>
+  <div class="note">
+    <strong>Regel:</strong> Die MIB-Referenzen bleiben subtil. Wer den Film kennt, erkennt die Codes. Alle anderen sehen einen clean inszenierten Rapper im Anzug.
+  </div>
+</section>
+
+<!-- ============ 2. EQUIPMENT ============ -->
+<section>
+  <h2>02 — Equipment & Settings</h2>
+
+  <table>
+    <tr><th>Komponente</th><th>Modell</th><th>Einsatz</th></tr>
+    <tr><td><strong>Kamera</strong></td><td>Sony A7IV (Full Rig)</td><td>4K 24fps / 120fps 1080p für Slow-Mo</td></tr>
+    <tr><td><strong>Zoom</strong></td><td>Sigma 24-70mm f/2.8 Art II</td><td>Flexibel für Performance + B-Roll</td></tr>
+    <tr><td><strong>Primes (Miete)</strong></td><td>DZOFilm VESPID 25mm / 50mm / 75mm</td><td>Cinematic Bokeh, Flares, Kompression</td></tr>
+    <tr><td><strong>Drohne</strong></td><td>DJI Air 3S</td><td>Establishing, Top-Down, Reveals</td></tr>
+    <tr><td><strong>Support</strong></td><td>Stativ + Handheld Rig</td><td>Stativ = Tableaus, Handheld = Energie</td></tr>
+  </table>
+
+  <h3>Kamera-Settings</h3>
+  <table>
+    <tr><th>Setting</th><th>Wert</th></tr>
+    <tr><td><strong>Profil</strong></td><td>S-Log3 (maximale Flexibilität im Grade)</td></tr>
+    <tr><td><strong>Framerate</strong></td><td>24fps Standard / 120fps für Slow-Mo (Agent Walk, Flash)</td></tr>
+    <tr><td><strong>Shutter</strong></td><td>1/48 (180° Rule)</td></tr>
+    <tr><td><strong>ISO</strong></td><td>800–3200 (Dual Base ISO nutzen, S-Log3 Base = 640)</td></tr>
+    <tr><td><strong>Blende</strong></td><td>f/2.1–f/2.8 offen für Bokeh</td></tr>
+    <tr><td><strong>WB</strong></td><td>Manuell ~4000K (kühl, kontrastiert mit warmen Practicals)</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>DZOFilm Empfehlung:</strong> Das 50mm wird eure Hauptlinse für ca. 70% aller Shots. 25mm für Weitwinkel-Establishing und Agent Walk. 75mm für enge Close-Ups. Ca. 80–120€/Tag Miete – lohnt sich massiv für den Look.
+  </div>
+</section>
+
+<!-- ============ 3. LOCATIONS ============ -->
+<section>
+  <h2>03 — Locations (Frankfurt)</h2>
+
+  <div class="shot-grid">
+    <div class="shot-card featured">
+      <div class="sc-num">LOC 01 — HAUPTLOCATION</div>
+      <div class="sc-title">Parkhaus</div>
+      <div class="sc-detail">
+        Hauptperformance, Agent Walk, Interrogation-Setup.<br>
+        <strong>Licht:</strong> Key Light 45° seitlich (hart, kein Diffusor) + Backlight/Rim + Autoscheinwerfer im BG + Nebelmaschine<br>
+        <strong>Tipp:</strong> 1–2 Autos mit Fernlicht im Hintergrund = kostenloses cinematic Light + Flares
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num">LOC 02</div>
+      <div class="sc-title">Straße / Skyline</div>
+      <div class="sc-detail">
+        B-Roll, Hood-Shots, Drohne Skyline.<br>
+        <strong>Dreh:</strong> Blue Hour (30 Min nach Sonnenuntergang)<br>
+        <strong>Licht:</strong> Natürlich + kleines LED-Panel als Eye Light
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num">LOC 03</div>
+      <div class="sc-title">Tunnel / Unterführung</div>
+      <div class="sc-detail">
+        Walking Shots, Silhouette, Atmosphäre.<br>
+        <strong>Licht:</strong> Vorhandene Neonröhren + Backlight am Ende + Nebel
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. LIGHTING ============ -->
+<section>
+  <h2>04 — Lighting-Konzept</h2>
+  <p>Konsequent Low Key. Der Großteil des Bildes ist dunkel, nur gezielte Bereiche werden ausgeleuchtet.</p>
+
+  <table>
+    <tr><th>Lichtquelle</th><th>Position</th><th>Funktion</th></tr>
+    <tr><td><strong>Key Light</strong></td><td>45° seitlich, erhöht</td><td>Hart, kein Diffusor. Dramatischer Schatten auf halber Gesichtsseite</td></tr>
+    <tr><td><strong>Backlight / Rim</strong></td><td>Direkt hinter Artist</td><td>Silhouette + Haarkontur. Nebel davor = God Rays</td></tr>
+    <tr><td><strong>Autoscheinwerfer</strong></td><td>Hintergrund, angewinkelt</td><td>Tiefe, Flares, Ambiente. Fernlicht = härterer Look</td></tr>
+    <tr><td><strong>Nebelmaschine</strong></td><td>Überall</td><td>ESSENTIELL. Macht Lichtstrahlen sichtbar. Hazer bevorzugt. Vor jedem Take nachlegen</td></tr>
+    <tr><td><strong>Practicals</strong></td><td>Im Bild verteilt</td><td>LED-Strips, Handys, kleine LEDs = visuelle Ankerpunkte</td></tr>
+    <tr><td><strong>Interrogation</strong></td><td>Lampe von oben</td><td>Einzelne sichtbare Lampe, alles andere schwarz. Schwarzer Stoff als BG</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>Negative Fill:</strong> Schwarzen Stoff / Molton auf der Schattenseite platzieren für maximalen Kontrast. Kostet nichts, bringt extrem viel.
+  </div>
+</section>
+
+<!-- ============ 5. MIB REFERENZEN ============ -->
+<section>
+  <h2>05 — MIB-Referenzen (Umsetzung)</h2>
+
+  <div class="shot-grid">
+    <div class="shot-card">
+      <div class="sc-num">REF 01</div>
+      <div class="sc-title">Agent Walk</div>
+      <div class="sc-detail">
+        Anzug + Brille, Slow-Mo auf Kamera zu, Nebel am Boden.<br>
+        <strong>Linse:</strong> 25mm Low Angle, Stativ am Boden<br>
+        <strong>120fps</strong> → Speed Ramp in Post (80% → 40% → 100%)<br>
+        <strong>Licht:</strong> Starkes Backlight + Nebel
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num">REF 02</div>
+      <div class="sc-title">Neuralyzer Flash</div>
+      <div class="sc-detail">
+        Letzter Shot: Hand heben → Lichtblitz → Whiteout → Schwarz.<br>
+        <strong>Umsetzung:</strong> LED-Panel auf Max direkt ins Objektiv<br>
+        <strong>Post:</strong> Exposure Ramp + Whiteout + Lens Flare Overlay<br>
+        <strong>Sound:</strong> Hochfrequenter Ton + Bass Drop
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num">REF 03</div>
+      <div class="sc-title">Undercover Look</div>
+      <div class="sc-detail">
+        Halbes Gesicht im Schatten, Sonnenbrille reflektiert Licht.<br>
+        <strong>Linse:</strong> 75mm Tight CU<br>
+        <strong>Licht:</strong> Hartes Seitenlicht, kein Fill. Negative Fill auf Schattenseite
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num">REF 04</div>
+      <div class="sc-title">Interrogation Room</div>
+      <div class="sc-detail">
+        Tisch + eine Lampe von oben. Alles außerhalb = schwarz.<br>
+        <strong>Linse:</strong> 50mm, langsamer Push-In<br>
+        <strong>Setup:</strong> Parkhaus-Ecke, schwarzer Stoff, Practical Light
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. SKRIPT: LYRICS + SHOTS ============ -->
+<section>
+  <h2>06 — Skript: Lyrics × Shots</h2>
+  <p>Jede Zeile mit zugehöriger visueller Anweisung. Gold markierte Zeilen = Key Shots.</p>
+
+  <!-- ---- INTRO ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">INTRO</div>
+      <div class="block-time">0:00 – 0:12</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text" style="color:var(--text-dim); font-style:italic;">[Kein Text – Atmosphäre]</div>
+      <div class="lyric-direction"><strong>Drohne:</strong> Langsamer Descent über Parkhaus, Nebel, Autoscheinwerfer im BG. Cut zu: Silhouette des Artists im Gegenlicht. Cut zu: Detail – Sonnenbrille aufsetzen (75mm). Cut zu: Füße laufen auf Kamera zu (Low Angle 25mm).</div>
+    </div>
+  </div>
+
+  <!-- ---- HOOK 1 ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">HOOK 1</div>
+      <div class="block-time">0:12 – 0:42</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Mein Bro muss für 3 Jahre weg</div>
+      <div class="lyric-direction"><strong>Silhouette Shot:</strong> Artist allein, Backlight. Oder: <strong>Insert</strong> Handschellen / Gitter-Schatten auf Gesicht</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Währenddessen sitzt RK seit 3,6</div>
+      <div class="lyric-direction">Medium CU, halbes Gesicht im Schatten. Langsamer Kopfschütteln. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Rapper sind cap / dass nur leeres Geschwätz</div>
+      <div class="lyric-direction"><strong>Insert:</strong> Handy wegdrücken / auf Tisch legen. Oder: verächtlicher Blick, Kamera leicht dutch angle</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Kommt ich zeig dir denn Shit / nicht nur im Internet okay</div>
+      <div class="lyric-direction">Performance Medium Shot, Handheld, Artist zeigt Richtung Kamera. Energie aufbauen. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Men in black wenn in step wie Agent</div>
+      <div class="lyric-direction"><strong>KEY SHOT — Agent Walk:</strong> 25mm Low Angle, 120fps Slow-Mo. Anzug + Brille, Nebel, Backlight. Speed Ramp in Post</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Undercover gut verdeckt okay</div>
+      <div class="lyric-direction"><strong>Undercover Look:</strong> 75mm Tight CU, hartes Seitenlicht, halbes Gesicht verdeckt. Negative Fill</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Bullets sind fast wie ein Jet</div>
+      <div class="lyric-direction"><strong>Motion Shot:</strong> Schneller Whip Pan + Snap Zoom. Oder: Dutch Angle mit schnellem Handheld. Sound-Design betonen</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Mich zu testen / wäre nicht intelligent</div>
+      <div class="lyric-direction">Tight CU Augen über Sonnenbrille hinweg. Starker Blick direkt in Linse. 75mm, statisch</div>
+    </div>
+  </div>
+
+  <!-- ---- VERSE 1 ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">VERSE 1</div>
+      <div class="block-time">0:42 – 1:15</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Erkenn immer mein Vorteil / will noch mehr haben als am Vortag</div>
+      <div class="lyric-direction">Performance 50mm Medium CU, leichtes Handheld. Parkhaus-Setting</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Ich krieg DM's wegen großem Wortschatz</div>
+      <div class="lyric-direction">Insert: Handy-Screen leuchtet im Dunkeln. Oder: Artist schaut auf Handy, Licht reflektiert im Gesicht</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Bijuu bekannt / nicht nur in meiner Ortschaft</div>
+      <div class="lyric-direction">B-Roll: Drohne Skyline Frankfurt, Blue Hour. Cut zu: Straßenszene</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Will auf meinen Bank Account / mindestens Pi (π)</div>
+      <div class="lyric-direction">Performance, selbstbewusster Look. 50mm, Stativ. Clean framing</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Stimme dirty macht mein Money clean</div>
+      <div class="lyric-direction">Interrogation Setup: Tisch + Lampe von oben, Artist lehnt zurück. 50mm Push-In</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Irgendsone Ratte / wollte in mein Team</div>
+      <div class="lyric-direction">Schatten auf Gesicht, verächtlicher Ausdruck. Negative Fill, 75mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Er jagt wirklich seine biggest dreams</div>
+      <div class="lyric-direction">Wide Shot Tunnel, Artist läuft Richtung Licht am Ende. 25mm, Silhouette</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Wenig Leute ein paar die vom Anfang sind</div>
+      <div class="lyric-direction">B-Roll: Crew auf der Straße, Dap-Ups, ehrliche Momente. 25mm Handheld</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Ein paar schrieben als es besser lief</div>
+      <div class="lyric-direction">Insert: Handy Notifications, Artist wischt weg. Oder: Handy umdrehen (Bildschirm nach unten)</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Sogar meine Nahrung weiß ich bin Bandit</div>
+      <div class="lyric-direction">Performance CU, leichtes Schmunzeln. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Lieb nur Money und bisschen SUV's</div>
+      <div class="lyric-direction">B-Roll: Auto im Parkhaus, Scheinwerfer an, Nebel. Oder: Artist lehnt an Auto</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Bijuu will ein Urus und ein GLE</div>
+      <div class="lyric-direction">Drohne: Top-Down auf Auto im Parkhaus, langsamer Descent</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Noch ein Paket oder noch ein Lied</div>
+      <div class="lyric-direction">Performance Medium, Energie steigt. Handheld näher rankommen. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Mein Bro ist ein Macher / Nigga free my G</div>
+      <div class="lyric-direction">Emotional: Silhouette Wide Shot, Artist allein. Oder: CU Gesicht, ehrlicher Moment. Backlight only</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Free mein Akh / Bullen unsere Enemy's</div>
+      <div class="lyric-direction">Performance aggressiv, direkt in Kamera. Handheld, leicht wackelig für Intensität. 25mm</div>
+    </div>
+  </div>
+
+  <!-- ---- HOOK 2 ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">HOOK 2</div>
+      <div class="block-time">1:15 – 1:42</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text" style="color:var(--text-dim);">[Gleicher Text wie Hook 1]</div>
+      <div class="lyric-direction">Neue Winkel auf dieselben Setups. Andere Seite beleuchten, andere Focals. Agent Walk von hinten (Over-Shoulder). Undercover Look jetzt mit Sonnenbrille-Reflektion. Mehr Energie, schnellere Cuts</div>
+    </div>
+  </div>
+
+  <!-- ---- VERSE 2 ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">VERSE 2</div>
+      <div class="block-time">1:42 – 2:15</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Wenn es muss ja dann shoot ich / Ganze Gang Real</div>
+      <div class="lyric-direction">Aggressive Performance, Dutch Angle, Handheld. 25mm, nah. Maximale Energie</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Nein wir brauchen kein Bluttest</div>
+      <div class="lyric-direction">Tight CU, abwinkende Geste. 75mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Meine Baddies wollen immer was Gutes</div>
+      <div class="lyric-direction">Performance Medium, selbstbewusst. Smooth Handheld. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Sie kann kein German / doch wünscht mir ein guten Tag</div>
+      <div class="lyric-direction">Leichtes Schmunzeln, CU. Oder: Insert Handy mit Nachricht</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Sie denkt ich wär ein Superstar</div>
+      <div class="lyric-direction"><strong>Paparazzi Shot:</strong> Handykameras / Blitzlicht auf den Artist. Hektisches Handheld, Flash-Bursts. 50mm</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Sie will nicht mehr zurück in die USA</div>
+      <div class="lyric-direction">Performance, lässig. 50mm, leichtes Handheld</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">Ich schick sie back sowie UPS</div>
+      <div class="lyric-direction"><strong>Comedy Cut:</strong> Humorvoller Quick-Cut, übertriebener Gesichtsausdruck. Bewusst anderes Licht (flat, hell) für Kontrast. Schneller Schnitt</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Ich war weg / noch bevor dann ihr Uber kam</div>
+      <div class="lyric-direction">Walking Shot: Artist dreht sich weg, läuft in Dunkelheit. 25mm, Rückansicht</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Fast wie ein Hurrikan / back in die Hood</div>
+      <div class="lyric-direction">Schnelle Cuts: Straße, Tunnel, Parkhaus. Tempo erhöhen. B-Roll Mix</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Weil grade Loot ankam</div>
+      <div class="lyric-direction">Performance, zufriedener Look. 50mm CU</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Ich geb dein Geld aus in BLN / Lordy wollte noch zum Ku'damm fahren</div>
+      <div class="lyric-direction">B-Roll: Auto fährt durch Parkhaus, Scheinwerfer streifen Wände. Drohne optional</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Manchmal mach Money ungewollt / dein Arbeiter hat sich heute nur vertan</div>
+      <div class="lyric-direction">Performance, lässig-arrogant. 50mm Medium, Stativ. Clean Framing, Artist dominiert das Bild</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Bijuu Bandit sowie Rich the Kid</div>
+      <div class="lyric-direction">Wide Performance, voller Körper. 25mm. Energie-Peak</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text">Ich lass mein Plug / nicht mal mit U-Bahn fahren</div>
+      <div class="lyric-direction">Interrogation Callback: Zurück zum Tisch + Lampe Setup, Artist steht auf und geht. 50mm</div>
+    </div>
+  </div>
+
+  <!-- ---- HOOK 3 + OUTRO ---- -->
+  <div class="lyric-block">
+    <div class="block-header">
+      <div class="block-title">HOOK 3 → OUTRO</div>
+      <div class="block-time">2:15 – 2:36</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text" style="color:var(--text-dim);">[Hook wiederholt – verkürzt]</div>
+      <div class="lyric-direction">Schnellste Cuts des ganzen Videos. Best-of aus allen Setups: Agent Walk (neuer Winkel), Undercover, Silhouette, Performance-Highlights. Jeder Cut auf Beat</div>
+    </div>
+    <div class="lyric-line">
+      <div class="lyric-text highlight">[Letzter Beat → Stille]</div>
+      <div class="lyric-direction"><strong>KEY SHOT — Neuralyzer Flash:</strong> Artist hebt Hand → LED auf Max ins Objektiv → Bild wird komplett weiß → Fade to Black. Sound: hochfrequenter Ton → Bass Drop → Stille</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. GRADING ============ -->
+<section>
+  <h2>07 — Color Grading</h2>
+  <table>
+    <tr><th>Parameter</th><th>Vorgabe</th></tr>
+    <tr><td><strong>Kontrast</strong></td><td>Hoch. Crushed Blacks (Schwarzwerte leicht anheben, nicht clippen)</td></tr>
+    <tr><td><strong>Sättigung</strong></td><td>Global auf 60–70% reduziert. Hauttöne geschützt (HSL-Qualifier)</td></tr>
+    <tr><td><strong>Schatten</strong></td><td>Kühl – Teal/Blau, nicht zu gesättigt</td></tr>
+    <tr><td><strong>Highlights</strong></td><td>Warm – gediegenes Gold (kein Orange)</td></tr>
+    <tr><td><strong>Vignette</strong></td><td>Leicht auf allen Shots, verstärkt bei Interrogation</td></tr>
+    <tr><td><strong>Film Grain</strong></td><td>Subtiler 35mm Grain, Stärke 8–15%</td></tr>
+  </table>
+  <div class="note">
+    <strong>LUT-Empfehlung:</strong> Als Basis einen Teal & Gold LUT nehmen (z.B. Osiris, Phantom LUTs) und dann manuell anpassen. Nicht blind einen LUT draufklatschen – immer Hauttöne schützen und Schatten kontrollieren.
+  </div>
+</section>
+
+<!-- ============ 8. DREHPLAN ============ -->
+<section>
+  <h2>08 — Drehplan</h2>
+  <p>Empfehlung: 1 Drehtag, Start am späten Nachmittag. Straße/Skyline in der Blue Hour, dann Parkhaus bei Dunkelheit.</p>
+
+  <table>
+    <tr><th>Zeit</th><th>Location</th><th>Was</th></tr>
+    <tr><td><strong>16:00</strong></td><td>Ankunft</td><td>Equipment aufbauen, Parkhaus scouten, Licht setzen, Nebel testen, Interrogation-Ecke vorbereiten</td></tr>
+    <tr><td><strong>17:00</strong></td><td>Straße / Skyline</td><td>Drohne Skyline, B-Roll Straße, Hood-Shots, Walking Shots. Blue Hour nutzen</td></tr>
+    <tr><td><strong>18:00</strong></td><td>Tunnel</td><td>Silhouette Walking Shots, Tunnel-Atmosphäre, Nebel</td></tr>
+    <tr><td><strong>19:00</strong></td><td>Parkhaus</td><td>Interrogation Setup zuerst (solange frisch). Tisch + Lampe Shots</td></tr>
+    <tr><td><strong>19:45</strong></td><td>Parkhaus</td><td>Hauptperformance: Alle Performance-Shots, Close-Ups, verschiedene Winkel durchschiessen</td></tr>
+    <tr><td><strong>21:00</strong></td><td>Parkhaus</td><td>Agent Walk (120fps), Silhouette Shots, Undercover Look – alle Key Shots</td></tr>
+    <tr><td><strong>22:00</strong></td><td>Parkhaus</td><td>Neuralyzer Flash (Outro), Pick-Ups, Safety Shots</td></tr>
+    <tr><td><strong>22:30</strong></td><td>—</td><td>Wrap</td></tr>
+  </table>
+
+  <div class="note">
+    <strong>Tipp:</strong> Alle Performance-Shots am Stück durchschiessen mit verschiedenen Focals (25mm, 50mm, 75mm). Song 3–4x komplett durchlaufen lassen pro Linse. Das gibt euch im Schnitt maximale Flexibilität.
+  </div>
+</section>
+
+<!-- ============ 9. PACKLISTE ============ -->
+<section>
+  <h2>09 — Packliste</h2>
+
+  <h3>Kamera & Optik</h3>
+  <ul class="checklist">
+    <li><strong>Sony A7IV</strong> + Akkus (mind. 4x), SD-Karten (mind. 256GB gesamt)</li>
+    <li><strong>Sigma 24-70mm f/2.8</strong> (Backup)</li>
+    <li><strong>DZOFilm VESPID Primes</strong> 25mm / 50mm / 75mm + Adapter (Sony E-Mount)</li>
+    <li><strong>DJI Air 3S</strong> + Akkus (mind. 3x), Controller, ND-Filter</li>
+    <li>Stativ + Handheld Rig + Schnellwechselplatte</li>
+    <li>ND-Filter Set (Variable ND oder Fixed 3/6 Stop) für offene Blende bei Restlicht</li>
+  </ul>
+
+  <h3>Licht & Atmosphäre</h3>
+  <ul class="checklist">
+    <li><strong>Key Light</strong> (Aputure 300D / 120D oder vergleichbar) + Reflektor</li>
+    <li><strong>Backlight</strong> (zweites LED-Panel oder starke LED)</li>
+    <li><strong>Nebelmaschine / Hazer</strong> + Fluid (genug für 4+ Stunden)</li>
+    <li>Kleines LED-Panel (Aputure MC o.ä.) als Eye Light / Akzent</li>
+    <li>Schwarzer Stoff / Molton (mind. 2x3m) für Negative Fill + Interrogation BG</li>
+    <li>Praktische Lichter: LED-Strips, kleine LEDs für Tiefe</li>
+    <li>Verlängerungskabel + Mehrfachsteckdose</li>
+  </ul>
+
+  <h3>Set</h3>
+  <ul class="checklist">
+    <li><strong>Outfit:</strong> Schwarzer Anzug, weißes/schwarzes Hemd, Sonnenbrille</li>
+    <li>Klapptisch + Stuhl (Interrogation)</li>
+    <li>Schreibtischlampe / Practical Light (sichtbar im Bild)</li>
+    <li>Gaffer Tape, C-Stands oder Lichtstative</li>
+    <li>Monitor / externer Bildschirm zum Kontrollieren</li>
+  </ul>
+
+  <h3>Sonstiges</h3>
+  <ul class="checklist">
+    <li>Bluetooth-Box für Playback am Set</li>
+    <li>Laptop für schnelle Sichtung</li>
+    <li>Wasser, Snacks, Energie für 6+ Stunden</li>
+  </ul>
+</section>
+
+<!-- ============ 10. KEY SHOTS SUMMARY ============ -->
+<section>
+  <h2>10 — Die 3 wichtigsten Shots</h2>
+  <p>Wenn ihr nur drei Shots perfekt hinbekommt, dann diese:</p>
+
+  <div class="shot-grid">
+    <div class="shot-card featured">
+      <div class="sc-num" style="color:var(--gold);">★ KEY SHOT 1</div>
+      <div class="sc-title">Agent Walk im Parkhaus</div>
+      <div class="sc-detail">
+        25mm Low Angle am Boden. 120fps Slow-Mo. Anzug + Brille. Nebel verdeckt den Boden. Starkes Backlight hinter dem Artist. Speed Ramp in Post.<br><br>
+        <strong>Lyric-Zuordnung:</strong> „Men in black wenn in step wie Agent"
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num" style="color:var(--gold);">★ KEY SHOT 2</div>
+      <div class="sc-title">Silhouette Shot</div>
+      <div class="sc-detail">
+        Starkes Backlight, nur Umriss sichtbar. Kein Fill. Artist steht oder geht. 25mm oder 50mm, Stativ.<br><br>
+        <strong>Lyric-Zuordnung:</strong> „Mein Bro muss für 3 Jahre weg"
+      </div>
+    </div>
+    <div class="shot-card">
+      <div class="sc-num" style="color:var(--gold);">★ KEY SHOT 3</div>
+      <div class="sc-title">Neuralyzer Flash (Outro)</div>
+      <div class="sc-detail">
+        LED-Panel auf Max ins Objektiv → Whiteout → Fade to Black. Letzter Shot des Videos. Cineastisches Ende.<br><br>
+        <strong>Lyric-Zuordnung:</strong> Letzter Beat → Stille
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  MIB — HONEYDABANDIT — PRODUKTIONSSKRIPT — 2026
+</div>
+
+</body>
+</html>
